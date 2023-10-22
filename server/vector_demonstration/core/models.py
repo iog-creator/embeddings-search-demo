@@ -140,9 +140,9 @@ class JobDescription(AbstractBaseModel):
             page_size = 1000
             num_pages = cls.objects.count() // page_size + 1
             for page in range(num_pages):
-                qs = cls.objects.filter(language="")[page * page_size : (page + 1) * page_size]
-                for job_description in qs:
-                    yield job_description
+                yield from cls.objects.filter(language="")[
+                    page * page_size : (page + 1) * page_size
+                ]
 
         count = 0
         total_jds = cls.objects.filter(language="").count()
@@ -217,8 +217,8 @@ class JobDescription(AbstractBaseModel):
                 unique_jds[chunk.job_description.id]["chunks"].append(chunk)
 
         results = []
-        for k, v in unique_jds.items():
-            score = sum([c.distance for c in v["chunks"]]) / len(v["chunks"])
+        for v in unique_jds.values():
+            score = sum(c.distance for c in v["chunks"]) / len(v["chunks"])
             job_description = v["job_description"]
             results.append(JobDescriptionSearchResult(score, job_description, v["chunks"]))
 

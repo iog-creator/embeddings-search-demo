@@ -61,18 +61,16 @@ def send_html_email(subject, template, send_from, send_to, context={}, bcc_email
     # Handle file attachments
     for f in files or []:
         if isinstance(f, tuple):
-            # Attach in-memory files with filename
-            if isinstance(f[1], StringIO.OutputType):
-                part = MIMEApplication(f[1].getvalue(), Name=f[0])
-                part["Content-Disposition"] = 'attachment; filename="%s"' % f[0]
-            else:
+            if not isinstance(f[1], StringIO.OutputType):
                 # No other file type support -- only StringIO
                 continue
+            part = MIMEApplication(f[1].getvalue(), Name=f[0])
+            part["Content-Disposition"] = f'attachment; filename="{f[0]}"'
         elif isinstance(f, str):
             # Read file and create attachment
             with open(f, "rb") as fil:
                 part = MIMEApplication(fil.read(), Name=os.path.basename(f))
-                part["Content-Disposition"] = 'attachment; filename="%s"' % os.path.basename(f)
+                part["Content-Disposition"] = f'attachment; filename="{os.path.basename(f)}"'
         else:
             # Ignore list elements that are neither a tuple or string
             continue

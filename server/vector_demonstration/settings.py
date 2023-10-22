@@ -222,7 +222,7 @@ if ENABLE_EMAILS:
     EMAIL_HOST_PASSWORD = config("SMTP_PASSWORD")
     EMAIL_ALLOWED_DOMAINS = config("SMTP_VALID_TESTING_DOMAINS")
     EMAIL_USE_TLS = True
-    
+
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
@@ -235,13 +235,13 @@ if config("USE_AWS_STORAGE", cast=bool, default=False) and not IS_REVIEW_APP:
     AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
     AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
     AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
-    AWS_S3_CUSTOM_DOMAIN = AWS_STORAGE_BUCKET_NAME + ".s3.amazonaws.com"
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
     AWS_LOCATION = config("AWS_LOCATION")  # production, staging, etc
     AWS_S3_REGION_NAME = config("AWS_S3_REGION_NAME")
 
     aws_s3_domain = AWS_S3_CUSTOM_DOMAIN or f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
     # Default file storage is private
-    PRIVATE_MEDIAFILES_LOCATION = AWS_LOCATION + "/media"
+    PRIVATE_MEDIAFILES_LOCATION = f"{AWS_LOCATION}/media"
     DEFAULT_FILE_STORAGE = "vector_demonstration.utils.storages.PrivateMediaStorage"
     # STATICFILES_STORAGE = "vector_demonstration.utils.storages.StaticRootS3Boto3Storage"
     COLLECTFAST_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"
@@ -353,8 +353,11 @@ if IN_PROD or ROLLBAR_ACCESS_TOKEN:
 # Popular testing framework that allows logging to stdout while running unit tests
 TEST_RUNNER = "django_nose.NoseTestSuiteRunner"
 
-CORS_ALLOWED_ORIGINS = ["https://vector-demonstration-staging.herokuapp.com", "https://vector-demonstration.herokuapp.com"]
-CORS_ALLOWED_ORIGINS.append("http://localhost:8080")
+CORS_ALLOWED_ORIGINS = [
+    "https://vector-demonstration-staging.herokuapp.com",
+    "https://vector-demonstration.herokuapp.com",
+    "http://localhost:8080",
+]
 SWAGGER_SETTINGS = {
     "LOGIN_URL": "/login",
     "USE_SESSION_AUTH": False,
