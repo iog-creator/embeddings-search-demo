@@ -46,9 +46,7 @@ class AutocompleteFilter(RelatedFieldListFilter):
         try:
             queryset = super().queryset(request, queryset)
         except IncorrectLookupParameters as e:
-            # Ignore exception for providing empty query parameter and just return unfiltered queryset.
-            if "is not a valid UUID." in str(e):
-                pass
+            pass
         if self.value:
             queryset = queryset.filter(**{self.parameter_name: self.value})
         return queryset
@@ -62,25 +60,26 @@ class AutocompleteAdminMedia:
     """
 
     i18n_name = SELECT2_TRANSLATIONS.get(get_language())
-    i18n_file = ("admin/js/vendor/select2/i18n/%s.js" % i18n_name,) if i18n_name else ()
+    i18n_file = (
+        (f"admin/js/vendor/select2/i18n/{i18n_name}.js",) if i18n_name else ()
+    )
     extra = "" if settings.DEBUG else ".min"
 
     js = (
         (
-            "admin/js/vendor/jquery/jquery%s.js" % extra,
-            "admin/js/vendor/select2/select2.full%s.js" % extra,
+            f"admin/js/vendor/jquery/jquery{extra}.js",
+            f"admin/js/vendor/select2/select2.full{extra}.js",
         )
         + i18n_file
-        + (
-            "admin/js/jquery.init.js",
-            "admin/js/autocomplete.js",
-            # Unlike all previous entries, this is a custom JS file from this project rather than a Django one!
-            "common/admin/autocompleteFilter.js",
-        )
+    ) + (
+        "admin/js/jquery.init.js",
+        "admin/js/autocomplete.js",
+        # Unlike all previous entries, this is a custom JS file from this project rather than a Django one!
+        "common/admin/autocompleteFilter.js",
     )
     css = {
         "screen": (
-            "admin/css/vendor/select2/select2%s.css" % extra,
+            f"admin/css/vendor/select2/select2{extra}.css",
             "admin/css/autocomplete.css",
         )
     }
